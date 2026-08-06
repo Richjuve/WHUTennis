@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const db = require('../db');
 const auth = require('../middleware/auth');
+const path = require('path');
+const fs = require('fs');
 const SECRET = 'school_tennis_secret_key';
 
 router.post('/login', (req, res) => {
@@ -27,6 +29,25 @@ router.get('/me', (req, res) => {
   } catch (err) {
     res.status(401).json({ error: '登录过期' });
   }
+});
+
+// 备份下载数据库（通过 token 参数）
+router.get('/backup', (req, res) => {
+  const token = req.query.token;
+  if (!token) return res.status(401).json({ error: '缺少 token' });
+  try {
+    const decoded = jwt.verify(token, SECRET);
+    if (decoded.role !== 'admin') return res.status(403).json({ error: '仅管理员' });
+  } catch (err) {
+    return res.status(401).json({ error: 'token 无效或过期' });
+  }
+
+  const dbPath = path.join(__dirname, '../database.db');
+  if (!fs.existsSync(dbPath)) {
+    return res.status(404).json({ error: '数据库文件不存在' });
+  }
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  res.download(dbPath, `backup-${timestamp}.db`);
 });
 
 router.put('/password', auth, (req, res) => {
@@ -64,23 +85,6 @@ router.delete('/users/:id', auth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: '仅管理员' });
   db.prepare('DELETE FROM users WHERE id = ?').run(req.params.id);
   res.json({ success: true });
-});
-
-const path = require('path');
-const fs = require('fs');
-
-// 备份下载数据库（仅管理员）
-router.get('/backup', auth, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ error: '仅管理员' });
-  
-  const dbPath = path.join(__dirname, '../database.db');
-  
-  if (!fs.existsSync(dbPath)) {
-    return res.status(404).json({ error: '数据库文件不存在' });
-  }
-  
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-  res.download(dbPath, `backup-${timestamp}.db`);
 });
 
 module.exports = router;
