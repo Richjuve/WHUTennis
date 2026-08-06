@@ -1,15 +1,17 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import TournamentDetail from './pages/TournamentDetail';
 import AdminDashboard from './pages/AdminDashboard';
 import AuthProvider, { useAuth } from './context/AuthContext';
 import { Button } from 'react-bootstrap';
+import './App.css';
 
 function NavBar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -17,20 +19,20 @@ function NavBar() {
   };
 
   return (
-    <nav className="navbar navbar-expand navbar-dark bg-dark">
+    <nav className="navbar navbar-expand navbar-custom" style={{ position: 'sticky', top: 0 }}>
       <div className="container">
-        <Link className="navbar-brand" to="/" style={{ color: '#CCFF00', fontFamily: 'Futura'}}>WHU Tennis</Link>
+        <Link className="navbar-brand" to="/" style={{ color: '#D6B25E', fontFamily: 'Futura'}}>WHU Tennis</Link>
         <div className="navbar-nav me-auto">
-          <Link className="nav-link" to="/">比赛</Link>
-          {user && <Link className="nav-link" to="/admin">管理</Link>}
+          <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">比赛</Link>
+          {user && <Link className={`nav-link ${location.pathname.startsWith('/admin') ? 'active' : ''}`} to="/admin">管理</Link>}
         </div>
         <div className="navbar-nav">
           {user ? (
             <div className="d-flex align-items-center">
-              <span className="me-3 small" style={{ color: '#E8E8E8' }}>
+              <span className="me-3 small" style={{ color: '#555' }}>
                 {user.name} ({user.role === 'admin' ? '管理员' : user.role === 'referee' ? '裁判' : '场地负责人'})
               </span>
-              <Button variant="dark" size="sm" onClick={handleLogout} style={{ color: '#E8E8E8' }}>
+              <Button variant="primary" size="sm" onClick={handleLogout}>
                 退出登录
               </Button>
             </div>

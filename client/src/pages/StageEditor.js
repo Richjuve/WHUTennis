@@ -10,21 +10,23 @@ export default function StageEditor() {
   const [stageName, setStageName] = useState('');
   const [stageType, setStageType] = useState('knockout');
   const [players, setPlayers] = useState([]);
+  const [tournamentName, setTournamentName] = useState('');
 
   useEffect(() => {
     if (!tournamentId) return;
+    axios.get(`/api/tournaments/${tournamentId}`).then(res => {
+      setTournamentName(res.data.name);
+    });
     axios.get(`/api/stages/by-tournament/${tournamentId}`).then(res => setStages(res.data));
     axios.get(`/api/players/by-tournament/${tournamentId}`).then(res => setPlayers(res.data));
   }, [tournamentId]);
 
   const addStage = async () => {
-    if (!stageName) return;
     try {
       await axios.post('/api/stages',
-        { tournament_id: tournamentId, name: stageName, type: stageType },
+        { tournament_id: tournamentId, name: stageType === 'group' ? '小组赛' : '淘汰赛', type: stageType },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      setStageName('');
       const res = await axios.get(`/api/stages/by-tournament/${tournamentId}`);
       setStages(res.data);
     } catch (err) {
@@ -48,15 +50,12 @@ export default function StageEditor() {
 
   return (
     <div>
-      <h5>阶段管理 - 比赛 #{tournamentId}</h5>
+      <h5>{tournamentName}</h5>
       <div className="row g-2 mb-3">
-        <div className="col-md-3">
-          <input className="form-control" placeholder="阶段名称" value={stageName} onChange={e => setStageName(e.target.value)} />
-        </div>
         <div className="col-md-2">
           <select className="form-select" value={stageType} onChange={e => setStageType(e.target.value)}>
-            <option value="knockout">淘汰赛</option>
             <option value="group">小组赛</option>
+            <option value="knockout">淘汰赛</option>
           </select>
         </div>
         <div className="col-md-2">
@@ -69,7 +68,7 @@ export default function StageEditor() {
       {stages.map(stage => (
         <div key={stage.id} className="card mb-3">
           <div className="card-header d-flex justify-content-between align-items-center">
-            <span>{stage.name} ({stage.type === 'knockout' ? '淘汰赛' : '小组赛'})</span>
+            <span>{stage.type === 'knockout' ? '淘汰赛' : '小组赛'}</span>
             <button className="btn btn-sm btn-danger" onClick={() => deleteStage(stage.id)}>删除阶段</button>
           </div>
           <div className="card-body">
@@ -407,8 +406,8 @@ function KnockoutEditor({ stageId, players, tournamentId }) {
     if (p.seed) label += `[${p.seed}]`;
     const info = playerRankInfo[p.id];
     if (info) {
-      label += ` ← ${info.stageName}-${info.groupName}`;
-      if (info.rank) label += ` 第${info.rank}名`;
+      label += ` ${info.stageName}-${info.groupName}`;
+      if (info.rank) label += `  No.${info.rank}`;
     }
     return label;
   };

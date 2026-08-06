@@ -9,9 +9,9 @@ const fs = require('fs');
 const SECRET = 'school_tennis_secret_key';
 
 router.post('/login', (req, res) => {
-  const { name, student_id, password } = req.body;
-  const user = db.prepare('SELECT * FROM users WHERE name = ? AND student_id = ?').get(name, student_id);
-  if (!user) return res.status(401).json({ error: '姓名或学号错误' });
+  const { student_id, password } = req.body;
+  const user = db.prepare('SELECT * FROM users WHERE student_id = ?').get(student_id);
+  if (!user) return res.status(401).json({ error: '学号错误' });
   const valid = bcrypt.compareSync(password, user.password_hash);
   if (!valid) return res.status(401).json({ error: '密码错误' });
   const token = jwt.sign({ id: user.id, role: user.role }, SECRET, { expiresIn: '7d' });

@@ -20,11 +20,11 @@ export default function AuthProvider({ children }) {
     }
   }, []);
 
-  const login = async (name, studentId, password) => {
-    const res = await axios.post('/api/auth/login', { name, student_id: studentId, password });
-    localStorage.setItem('token', res.data.token);
-    setUser(res.data.user);
-  };
+ const login = async (studentId, password) => {
+  const res = await axios.post('/api/auth/login', { student_id: studentId, password });
+  localStorage.setItem('token', res.data.token);
+  setUser(res.data.user);
+};
 
   const logout = () => {
     localStorage.removeItem('token');

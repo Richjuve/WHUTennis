@@ -32,7 +32,7 @@ export default function TournamentDetail() {
       <h3>{tournament.name}</h3>
       <Tabs defaultActiveKey="group-0" className="mb-3">
         {stages.filter(s => s.type === 'group').map(stage => (
-          <Tab key={stage.id} eventKey={`group-${stage.id}`} title={`📊 ${stage.name}`}>
+          <Tab key={stage.id} eventKey={`group-${stage.id}`} title={'小组赛'}>
             <GroupStandings 
               stageId={stage.id} 
               matches={matches.filter(m => m.stage_id === stage.id)} 
@@ -43,7 +43,7 @@ export default function TournamentDetail() {
           </Tab>
         ))}
         {stages.filter(s => s.type === 'knockout').map(stage => (
-          <Tab key={stage.id} eventKey={`knockout-${stage.id}`} title={`🏆 ${stage.name}`}>
+          <Tab key={stage.id} eventKey={`knockout-${stage.id}`} title={'淘汰赛'}>
             <KnockoutBracket 
               stageId={stage.id} 
               matches={matches.filter(m => m.stage_id === stage.id)} 

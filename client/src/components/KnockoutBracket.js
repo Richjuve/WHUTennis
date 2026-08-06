@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import axios from 'axios';
-import { jsPDF } from 'jspdf';
 import ScoreModal from './ScoreModal';
 
 export default function KnockoutBracket({ stageId, matches, user, onUpdate, tournamentConfig }) {
@@ -36,30 +35,6 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
     setShowModal(true);
   };
 
-  const exportPDF = () => {
-    try {
-      import('html2canvas').then(html2canvas => {
-        const input = document.getElementById('bracket-container');
-        if (!input) {
-          alert('找不到晋级图区域');
-          return;
-        }
-        html2canvas.default(input, { scale: 2 }).then(canvas => {
-          const pdf = new jsPDF('l', 'mm', 'a4');
-          const imgData = canvas.toDataURL('image/png');
-          pdf.addImage(imgData, 'PNG', 5, 5, 287, 200);
-          pdf.save('淘汰赛晋级图.pdf');
-        });
-      }).catch(err => {
-        console.error('PDF导出失败:', err);
-        alert('PDF导出失败，请稍后重试');
-      });
-    } catch (err) {
-      console.error('PDF导出失败:', err);
-      alert('PDF导出失败，请稍后重试');
-    }
-  };
-
   const renderMatchCard = (match, isThirdPlace = false) => {
     let sets = [];
     let walkover = false;
@@ -83,8 +58,14 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
 
     return (
       <div
-        className={`border p-2 mb-2 bg-white rounded shadow-sm ${isThirdPlace ? 'border-warning' : ''}`}
-        style={{ cursor: user ? 'pointer' : 'default' }}
+        className={`border p-3 mb-3 bg-white rounded-3 ${isThirdPlace ? 'border-warning' : ''}`}
+        style={{
+          cursor: user ? 'pointer' : 'default',
+          boxShadow: isFinished && (p1Winner || p2Winner) ? '0 2px 12px rgba(123, 31, 162, 0.15)' : '0 1px 3px rgba(0,0,0,0.05)',
+          borderLeft: isFinished && (p1Winner || p2Winner) ? '4px solid #7B1FA2' : '1px solid #e0e0e0',
+          transition: 'all 0.2s',
+          minWidth: 200,
+        }}
         onClick={() => handleSelectMatch(match)}
         title={user ? (isFinished ? '点击查看/编辑比分' : '点击录入比分') : ''}
       >
@@ -93,7 +74,13 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
             <tr>
               <td
                 className={`py-1 text-nowrap ${p1Winner ? 'fw-bold' : ''}`}
-                style={{ paddingRight: 12, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{
+                  paddingRight: 12,
+                  maxWidth: 100,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: p1Winner ? '#7B1FA2' : '#333'
+                }}
               >
                 {p1Name}
               </td>
@@ -101,7 +88,7 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
                 <td
                   key={idx}
                   className={`text-center px-0 py-1 ${p1Winner ? 'fw-bold' : ''}`}
-                  style={{ width: 32 }}
+                  style={{ width: 32, color: p1Winner ? '#7B1FA2' : '#333' }}
                 >
                   {set[0]}
                 </td>
@@ -119,7 +106,13 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
             <tr>
               <td
                 className={`py-1 text-nowrap ${p2Winner ? 'fw-bold' : ''}`}
-                style={{ paddingRight: 12, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis' }}
+                style={{
+                  paddingRight: 12,
+                  maxWidth: 100,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  color: p2Winner ? '#7B1FA2' : '#333'
+                }}
               >
                 {p2Name}
               </td>
@@ -127,7 +120,7 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
                 <td
                   key={idx}
                   className={`text-center px-0 py-1 ${p2Winner ? 'fw-bold' : ''}`}
-                  style={{ width: 32 }}
+                  style={{ width: 32, color: p2Winner ? '#7B1FA2' : '#333' }}
                 >
                   {set[1]}
                 </td>
@@ -150,20 +143,15 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
 
   return (
     <div>
-      {user && (
-        <Button variant="outline-secondary" size="sm" className="mb-2" onClick={exportPDF}>
-          📥 下载PDF
-        </Button>
-      )}
       <div id="bracket-container" style={{ overflowX: 'auto' }}>
         <div className="d-flex align-items-start">
           {rounds.map(round => (
             <div
               key={round}
               className="d-flex flex-column justify-content-around"
-              style={{ minWidth: 220, marginRight: 20 }}
+              style={{ minWidth: 230, marginRight: 20 }}
             >
-              <div className="text-center fw-bold mb-2">
+              <div className="text-center fw-bold mb-3" style={{ color: '#333', fontSize: '0.9rem' }}>
                 {getRoundLabel(round)}
               </div>
               {mainMatches
@@ -178,9 +166,11 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
           {hasThirdPlace && thirdPlaceMatch && (
             <div
               className="d-flex flex-column justify-content-center"
-              style={{ minWidth: 220, marginLeft: 20 }}
+              style={{ minWidth: 230, marginLeft: 20 }}
             >
-              <div className="text-center fw-bold mb-2">🥉 季军赛</div>
+              <div className="text-center fw-bold mb-3" style={{ color: '#F4A261', fontSize: '0.9rem' }}>
+                🥉 季军赛
+              </div>
               {renderMatchCard(thirdPlaceMatch, true)}
             </div>
           )}

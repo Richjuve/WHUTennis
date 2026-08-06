@@ -69,6 +69,7 @@ export default function AdminDashboard() {
         <Route path="/players" element={<PlayerManager />} />
         <Route path="/users" element={<UserManager />} />
         <Route path="/stages/:tournamentId" element={<StageEditor />} />
+        <Route path="/stages/:tournamentId" element={<StageEditor />} />
       </Routes>
     </div>
   );

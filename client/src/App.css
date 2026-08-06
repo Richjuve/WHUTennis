@@ -1,7 +1,172 @@
+/* 全局背景 */
 body {
-  padding-bottom: 60px;
+  background-color: #f5f6fa;
+  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-.container {
-  min-height: calc(100vh - 120px);
+
+/* 导航栏：白色背景 + 底部阴影 */
+.navbar-custom {
+  background-color: #fff !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-custom .navbar-brand {
+  color: #7B1FA2 !important;
+  font-weight: 700;
+}
+
+.navbar-custom .nav-link {
+  color: #555 !important;
+  transition: color 0.2s;
+}
+
+.navbar-custom .nav-link:hover {
+  color: #7B1FA2 !important;
+}
+
+.navbar-custom .nav-link.active,
+.navbar-custom .nav-link:focus {
+  color: #7B1FA2 !important;
+  font-weight: 500;
+}
+
+/* 按钮通用样式 */
+.btn {
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background-color: #7B1FA2 !important;
+  border-color: #7B1FA2 !important;
+}
+
+.btn-primary:hover {
+  background-color: #6A1B9A !important;
+  border-color: #6A1B9A !important;
+}
+
+.btn-primary:active,
+.btn-primary:focus {
+  background-color: #6A1B9A !important;
+  border-color: #6A1B9A !important;
+  box-shadow: 0 0 0 0.2rem rgba(123, 31, 162, 0.25) !important;
+}
+
+.btn-success {
+  background-color: #7CB342;
+  border-color: #7CB342;
+}
+
+.btn-success:hover {
+  background-color: #689F38;
+  border-color: #689F38;
+}
+
+/* 卡片样式 */
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* 输入框 */
+.form-control {
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.form-control:focus {
+  border-color: #7B1FA2;
+  box-shadow: 0 0 0 0.2rem rgba(123, 31, 162, 0.1);
+}
+
+/* 表格 */
+.table {
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.table thead th {
+  background-color: #fafafa;
+  border-bottom: 2px solid #eee;
+  font-weight: 600;
+  color: #555;
+}
+
+/* 比赛列表项 */
+.list-group-item {
+  border-radius: 10px !important;
+  margin-bottom: 8px;
+  border: 1px solid #eee;
+}
+
+/* 徽章 */
+.badge {
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 5px 10px;
+}
+
+/* 删除按钮：柔和红 */
+.btn-danger {
+  background-color: #E57373 !important;
+  border-color: #E57373 !important;
+}
+.btn-danger:hover {
+  background-color: #EF5350 !important;
+  border-color: #EF5350 !important;
+}
+
+/* 编辑按钮：淡紫 */
+.btn-outline-primary {
+  color: #7B1FA2 !important;
+  border-color: #7B1FA2 !important;
+}
+.btn-outline-primary:hover {
+  background-color: #7B1FA2 !important;
+  color: #fff !important;
+}
+
+/* 成功按钮：网球绿 */
+.btn-success {
+  background-color: #7CB342 !important;
+  border-color: #7CB342 !important;
+}
+.btn-success:hover {
+  background-color: #689F38 !important;
+  border-color: #689F38 !important;
+}
+
+/* 导航标签：选中紫色，未选中黑色 */
+.nav-tabs .nav-link {
+  color: #333 !important;
+  border: none !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: #7B1FA2 !important;
+  border-bottom: 2px solid #7B1FA2 !important;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #7B1FA2 !important;
+  border-bottom: 2px solid #AB47BC !important;
+}
+
+/* 选手库按钮：网球绿 */
+.btn-outline-secondary {
+  color: #7CB342 !important;
+  border-color: #7CB342 !important;
+}
+.btn-outline-secondary:hover {
+  background-color: #7CB342 !important;
+  color: #fff !important;
 }

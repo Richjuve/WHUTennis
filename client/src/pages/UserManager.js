@@ -11,27 +11,23 @@ export default function UserManager() {
   const [password, setPassword] = useState('');
 
   const fetchUsers = () => {
-    axios.get('/api/auth/users', { 
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
+    axios.get('/api/auth/users', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
     })
     .then(res => setUsers(res.data))
-    .catch(err => console.error('获取用户列表失败:', err));
+    .catch(err => console.error(err));
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   const createUser = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/api/auth/users', 
+      await axios.post('/api/auth/users',
         { name, student_id: sid, role, password },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
-      setName('');
-      setSid('');
-      setPassword('');
+      setName(''); setSid(''); setPassword('');
       fetchUsers();
     } catch (err) {
       alert(err.response?.data?.error || '创建失败');
@@ -40,19 +36,13 @@ export default function UserManager() {
 
   const deleteUser = async (id) => {
     if (!window.confirm('确定删除该用户？')) return;
-    try {
-      await axios.delete(`/api/auth/users/${id}`, { 
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } 
-      });
-      fetchUsers();
-    } catch (err) {
-      alert(err.response?.data?.error || '删除失败');
-    }
+    await axios.delete(`/api/auth/users/${id}`, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    });
+    fetchUsers();
   };
 
-  if (user?.role !== 'admin') {
-    return <div className="alert alert-danger">无权限访问</div>;
-  }
+  if (user?.role !== 'admin') return <div className="alert alert-danger">无权限访问</div>;
 
   return (
     <div>
@@ -65,7 +55,7 @@ export default function UserManager() {
           <input className="form-control" placeholder="学号" value={sid} onChange={e => setSid(e.target.value)} required />
         </div>
         <div className="col-md-2">
-          <input className="form-control" placeholder="密码(默认同学号)" value={password} onChange={e => setPassword(e.target.value)} />
+          <input className="form-control" placeholder="密码(默认学号)" value={password} onChange={e => setPassword(e.target.value)} />
         </div>
         <div className="col-md-2">
           <select className="form-select" value={role} onChange={e => setRole(e.target.value)}>
@@ -75,7 +65,7 @@ export default function UserManager() {
           </select>
         </div>
         <div className="col-md-2">
-          <button className="btn btn-success" type="submit">创建用户</button>
+          <button className="btn btn-primary" type="submit">创建用户</button>
         </div>
       </form>
 
@@ -95,7 +85,7 @@ export default function UserManager() {
               <td>{u.student_id}</td>
               <td>{u.role === 'admin' ? '管理员' : u.role === 'referee' ? '裁判' : '场地负责人'}</td>
               <td>
-                <button className="btn btn-danger btn-sm" onClick={() => deleteUser(u.id)}>删除</button>
+                <button className="btn btn-outline-danger btn-sm" onClick={() => deleteUser(u.id)}>删除</button>
               </td>
             </tr>
           ))}

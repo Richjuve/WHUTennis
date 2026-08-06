@@ -8,7 +8,7 @@ export default function TournamentSettings() {
   const navigate = useNavigate();
   const [tournaments, setTournaments] = useState([]);
   const [name, setName] = useState('');
-  const [config, setConfig] = useState({ bestOfSets: 3, gamesPerSet: 6, tiebreak: true });
+  const [config, setConfig] = useState({ bestOfSets: 1 });
 
   const fetch = () => {
     axios.get('/api/tournaments').then(res => setTournaments(res.data));
@@ -84,21 +84,11 @@ export default function TournamentSettings() {
             <select
               className="form-select"
               value={config.bestOfSets}
-              onChange={e => setConfig({...config, bestOfSets: parseInt(e.target.value)})}
+              onChange={e => setConfig({ bestOfSets: parseInt(e.target.value) })}
             >
               <option value={1}>1盘制</option>
               <option value={3}>3盘制</option>
               <option value={5}>5盘制</option>
-            </select>
-          </div>
-          <div className="col-md-2">
-            <select
-              className="form-select"
-              value={config.gamesPerSet}
-              onChange={e => setConfig({...config, gamesPerSet: parseInt(e.target.value)})}
-            >
-              <option value={4}>4局/盘</option>
-              <option value={6}>6局/盘</option>
             </select>
           </div>
           <div className="col-md-2">
@@ -138,7 +128,7 @@ export default function TournamentSettings() {
                     getStatusBadge(t.status)
                   )}
                 </td>
-                <td>{cfg.bestOfSets}盘{cfg.gamesPerSet}局</td>
+                <td>{cfg.bestOfSets}盘</td>
                 <td>
                   <button
                     className="btn btn-outline-primary btn-sm me-1"
