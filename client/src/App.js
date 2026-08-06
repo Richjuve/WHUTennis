@@ -23,7 +23,7 @@ function NavBar() {
       <div className="container">
         <Link className="navbar-brand" to="/" style={{ color: '#D6B25E', fontFamily: 'Futura'}}>WHU Tennis</Link>
         <div className="navbar-nav me-auto">
-          <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">比赛</Link>
+          <Link className={`nav-link ${location.pathname === '/' || location.pathname.startsWith('/tournament') ? 'active' : ''}`} to="/">比赛</Link>
           {user && <Link className={`nav-link ${location.pathname.startsWith('/admin') ? 'active' : ''}`} to="/admin">管理</Link>}
         </div>
         <div className="navbar-nav">

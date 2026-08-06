@@ -170,3 +170,10 @@ body {
   background-color: #7CB342 !important;
   color: #fff !important;
 }
+
+/* 比分数字字体 */
+.knockout-score {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+

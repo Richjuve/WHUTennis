@@ -6,6 +6,7 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
   const bestOfSets = tournamentConfig?.bestOfSets || 3;
   const [sets, setSets] = useState(Array.from({ length: bestOfSets }, () => ['', '']));
   const [walkover, setWalkover] = useState(false);
+  const [walkoverType, setWalkoverType] = useState('wo');
   const [winnerWalkover, setWinnerWalkover] = useState(1);
   const [court, setCourt] = useState('');
   const [referee, setReferee] = useState('');
@@ -15,12 +16,12 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
   useEffect(() => {
     if (show && match) {
       const emptySets = Array.from({ length: bestOfSets }, () => ['', '']);
-
       if (match.score_detail) {
         try {
           const detail = JSON.parse(match.score_detail);
           if (detail.walkover) {
             setWalkover(true);
+            setWalkoverType(detail.walkoverType || 'wo');
             setWinnerWalkover(detail.winnerWalkover || 1);
             setSets(emptySets);
             setHasExistingScore(true);
@@ -46,7 +47,6 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
         setWalkover(false);
         setHasExistingScore(false);
       }
-
       setCourt(match.court || '');
       setReferee(match.referee_name || '');
       setEditing(!match.score_detail);
@@ -62,7 +62,7 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
   const submit = async () => {
     let scoreDetail;
     if (walkover) {
-      scoreDetail = JSON.stringify({ walkover: true, winnerWalkover });
+      scoreDetail = JSON.stringify({ walkover: true, winnerWalkover, walkoverType });
     } else {
       scoreDetail = JSON.stringify({ sets: sets.filter(s => s[0] !== '' || s[1] !== '') });
     }
@@ -72,7 +72,7 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
         court: court || null,
         referee_name: referee || null,
         status: 'finished',
-        walkover_type: walkover ? (winnerWalkover === 1 ? 'player1' : 'player2') : null
+        walkover_type: walkover ? walkoverType : null
       }, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
       onSaved();
     } catch (err) {
@@ -83,7 +83,8 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
   const formatSetsDisplay = () => {
     if (walkover) {
       const winner = winnerWalkover === 1 ? match.player1_name : match.player2_name;
-      return `W/O (${winner} 胜)`;
+      const type = walkoverType === 'ret' ? 'RET' : 'W/O';
+      return `${type} (${winner} 胜)`;
     }
     const display = sets
       .filter(s => s[0] !== '' || s[1] !== '')
@@ -116,29 +117,9 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
             </div>
             {court && <div className="mb-2"><strong>场地：</strong>{court}</div>}
             {referee && <div className="mb-2"><strong>裁判员：</strong>{referee}</div>}
-            {!court && !referee && hasExistingScore && (
-              <div className="text-muted small">无场地/裁判信息</div>
-            )}
           </div>
         ) : (
           <>
-            <Form.Check
-              type="checkbox"
-              label="弃权/退赛"
-              checked={walkover}
-              onChange={e => setWalkover(e.target.checked)}
-              className="mb-2"
-            />
-            {walkover && (
-              <Form.Select
-                className="mb-2"
-                value={winnerWalkover}
-                onChange={e => setWinnerWalkover(parseInt(e.target.value))}
-              >
-                <option value={1}>{match.player1_name} 胜</option>
-                <option value={2}>{match.player2_name} 胜</option>
-              </Form.Select>
-            )}
             {!walkover && sets.map((set, i) => (
               <Row key={i} className="mb-2 align-items-center">
                 <Col xs={2}>
@@ -162,21 +143,40 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
                 </Col>
               </Row>
             ))}
+            <Form.Check
+              type="checkbox"
+              label="弃权/退赛"
+              checked={walkover}
+              onChange={e => setWalkover(e.target.checked)}
+              className="mb-2"
+            />
+            {walkover && (
+              <>
+                <Form.Select
+                  className="mb-2"
+                  value={walkoverType}
+                  onChange={e => setWalkoverType(e.target.value)}
+                >
+                  <option value="wo">W/O（对手未到场）</option>
+                  <option value="ret">RET（退赛）</option>
+                </Form.Select>
+                <Form.Select
+                  className="mb-2"
+                  value={winnerWalkover}
+                  onChange={e => setWinnerWalkover(parseInt(e.target.value))}
+                >
+                  <option value={1}>{match.player1_name} 胜</option>
+                  <option value={2}>{match.player2_name} 胜</option>
+                </Form.Select>
+              </>
+            )}
             <Form.Group className="mt-3">
               <Form.Label>场地</Form.Label>
-              <Form.Control
-                value={court}
-                onChange={e => setCourt(e.target.value)}
-                placeholder="如 1号场"
-              />
+              <Form.Control value={court} onChange={e => setCourt(e.target.value)} placeholder="如 1号场" />
             </Form.Group>
             <Form.Group className="mt-2">
               <Form.Label>裁判员</Form.Label>
-              <Form.Control
-                value={referee}
-                onChange={e => setReferee(e.target.value)}
-                placeholder="裁判姓名"
-              />
+              <Form.Control value={referee} onChange={e => setReferee(e.target.value)} placeholder="裁判姓名" />
             </Form.Group>
           </>
         )}

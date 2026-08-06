@@ -127,14 +127,23 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                   <tbody style={{ fontSize: '0.9rem' }}>
                     {groupMatches.map(match => {
                       let scoreDisplay = '-';
+                      let isWalkover = false;
+                      let walkoverType = 'wo';
                       if (match.score_detail) {
                         try {
                           const detail = JSON.parse(match.score_detail);
-                          if (detail.walkover) { scoreDisplay = 'W/O'; }
-                          else if (detail.sets) scoreDisplay = detail.sets.map(s => s.join('-')).join(', ');
+                          if (detail.walkover) {
+                            isWalkover = true;
+                            walkoverType = detail.walkoverType || 'wo';
+                            scoreDisplay = walkoverType === 'ret' ? 'RET.' : 'W/O';
+                          } else if (detail.sets) {
+                            scoreDisplay = detail.sets.map(s => s.join('-')).join(', ');
+                          }
                         } catch(e) {}
                       }
                       const isFinished = match.status === 'finished';
+                      const p1Winner = match.winner_id === match.player1_id;
+                      const p2Winner = match.winner_id === match.player2_id;
 
                       return (
                         <tr
@@ -142,15 +151,21 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                           onClick={() => handleMatchClick(match)}
                           style={{ cursor: user ? 'pointer' : 'default', borderBottom: '1px solid #f0f0f0' }}
                         >
-                          <td className={match.winner_id === match.player1_id ? 'fw-bold' : ''} style={{ color: match.winner_id === match.player1_id ? '#7B1FA2' : '#333' }}>
+                          <td className={p1Winner ? 'fw-bold' : ''}
+                            style={{ color: p1Winner ? '#7B1FA2' : '#333' }}>
                             {match.player1_name}{match.player1_seed ? `[${match.player1_seed}]` : ''}
                           </td>
-                          <td className={match.winner_id === match.player2_id ? 'fw-bold' : ''} style={{ color: match.winner_id === match.player2_id ? '#7B1FA2' : '#333' }}>
+                          <td className={p2Winner ? 'fw-bold' : ''}
+                            style={{ color: p2Winner ? '#7B1FA2' : '#333' }}>
                             {match.player2_name}{match.player2_seed ? `[${match.player2_seed}]` : ''}
                           </td>
-                          <td className="text-center" style={{ width: 100 }}>
+                          <td className="text-center" style={{ width: 300 }}>
                             {isFinished ? (
-                              <span className="fw-bold" style={{ color: '#7B1FA2' }}>{scoreDisplay}</span>
+                              <span className="fw-bold" style={{
+                                color: isWalkover && walkoverType === 'ret' ? '#E57373' : '#7B1FA2'
+                              }}>
+                                {scoreDisplay}
+                              </span>
                             ) : (
                               <span className="text-muted">-</span>
                             )}
