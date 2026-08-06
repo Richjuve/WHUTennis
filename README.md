@@ -23,3 +23,21 @@ cat > README.md << 'EOF'
 ```bash
 npm run install-all
 npm run dev
+浏览器打开 http://localhost:3000
+
+默认管理员：姓名 admin，学号 000000，密码 000000
+EOF
+
+git add README.md
+git commit -m "添加 README"
+git push
+
+---
+
+## 🚀 部署方案
+
+| 方案 | 说明 |
+|------|------|
+| **Railway / Render** | 免费部署全栈应用，适合个人项目 |
+| **Vercel + 后端分离** | 前端 Vercel，后端 Railway |
+| **服务器** | 阿里云/腾讯云学生机 |
