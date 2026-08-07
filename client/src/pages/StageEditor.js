@@ -11,6 +11,7 @@ export default function StageEditor() {
   const [stageType, setStageType] = useState('knockout');
   const [players, setPlayers] = useState([]);
   const [tournamentName, setTournamentName] = useState('');
+  const [gamesPerSet, setGamesPerSet] = useState(6);
 
   useEffect(() => {
     if (!tournamentId) return;
@@ -24,7 +25,7 @@ export default function StageEditor() {
   const addStage = async () => {
     try {
       await axios.post('/api/stages',
-        { tournament_id: tournamentId, name: stageType === 'group' ? '小组赛' : '淘汰赛', type: stageType },
+        { tournament_id: tournamentId, name: stageType === 'group' ? '小组赛' : '淘汰赛', type: stageType, games_per_set: gamesPerSet },
         { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
       );
       const res = await axios.get(`/api/stages/by-tournament/${tournamentId}`);
@@ -56,6 +57,12 @@ export default function StageEditor() {
           <select className="form-select" value={stageType} onChange={e => setStageType(e.target.value)}>
             <option value="group">小组赛</option>
             <option value="knockout">淘汰赛</option>
+          </select>
+        </div>
+        <div className="col-md-2">
+          <select className="form-select" value={gamesPerSet} onChange={e => setGamesPerSet(parseInt(e.target.value))}>
+            <option value={6}>6局制</option>
+            <option value={4}>4局制</option>
           </select>
         </div>
         <div className="col-md-2">

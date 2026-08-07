@@ -9,8 +9,12 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
   const [rankings, setRankings] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [gamesPerSet, setGamesPerSet] = useState(6);
 
   useEffect(() => {
+    axios.get(`/api/stages/${stageId}`).then(res => {
+      setGamesPerSet(res.data.games_per_set || 6);
+    });
     axios.get(`/api/stages/${stageId}/groups`).then(res => {
       setGroups(res.data);
       res.data.forEach(group => {
@@ -40,23 +44,68 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
       m.status === 'finished' && m.score_detail
     );
     let winSets = 0, lostSets = 0, winGames = 0, lostGames = 0;
+    let winMatches = 0, lostMatches = 0;
+
     playerMatches.forEach(m => {
       try {
         const detail = JSON.parse(m.score_detail);
+        const isPlayer1 = m.player1_id === playerId;
+
+        let iWin;
         if (detail.walkover) {
-          if ((detail.winnerWalkover === 1 && m.player1_id === playerId) ||
-              (detail.winnerWalkover === 2 && m.player2_id === playerId)) {
-            winSets += 1;
+          const winnerWalkover = detail.winnerWalkover;
+          iWin = (winnerWalkover === 1 && isPlayer1) || (winnerWalkover === 2 && !isPlayer1);
+        } else {
+          iWin = m.winner_id === playerId;
+        }
+
+        if (iWin) winMatches++;
+        else lostMatches++;
+
+        if (detail.walkover) {
+          if (detail.walkoverType === 'ret') {
+            let hasCompletedSet = false;
+            if (detail.sets && detail.sets.length > 0) {
+              detail.sets.forEach((set, idx) => {
+                const rawG1 = String(set[0]).replace(/\(.*\)/, '');
+                const rawG2 = String(set[1]).replace(/\(.*\)/, '');
+                const g1 = parseInt(rawG1) || 0;
+                const g2 = parseInt(rawG2) || 0;
+                if (isNaN(g1) || isNaN(g2)) return;
+                const myGames = isPlayer1 ? g1 : g2;
+                const oppGames = isPlayer1 ? g2 : g1;
+                winGames += myGames;
+                lostGames += oppGames;
+                if (idx < detail.sets.length - 1) {
+                  if (myGames > oppGames) winSets++;
+                  else lostSets++;
+                  hasCompletedSet = true;
+                }
+              });
+            }
+            if (hasCompletedSet) {
+              if (iWin) winSets++;
+              else lostSets++;
+            }
           } else {
-            lostSets += 1;
+            if (iWin) {
+              winSets += 1;
+              winGames += gamesPerSet;
+            } else {
+              lostSets += 1;
+              lostGames += gamesPerSet;
+            }
           }
           return;
         }
+
         if (detail.sets) {
           detail.sets.forEach(set => {
-            const g1 = parseInt(set[0]), g2 = parseInt(set[1]);
+            const rawG1 = String(set[0]).replace(/\(.*\)/, '');
+            const rawG2 = String(set[1]).replace(/\(.*\)/, '');
+            const g1 = parseInt(rawG1) || 0;
+            const g2 = parseInt(rawG2) || 0;
             if (isNaN(g1) || isNaN(g2)) return;
-            const isPlayer1 = m.player1_id === playerId;
             const myGames = isPlayer1 ? g1 : g2;
             const oppGames = isPlayer1 ? g2 : g1;
             winGames += myGames;
@@ -67,9 +116,11 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
         }
       } catch(e) {}
     });
+
     const totalSets = winSets + lostSets;
     const totalGames = winGames + lostGames;
     return {
+      winMatches, lostMatches,
       winSets, lostSets,
       setWinRate: totalSets > 0 ? ((winSets / totalSets) * 100).toFixed(1) + '%' : '-',
       winGames, lostGames,
@@ -127,17 +178,34 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                   <tbody style={{ fontSize: '0.9rem' }}>
                     {groupMatches.map(match => {
                       let scoreDisplay = '-';
-                      let isWalkover = false;
                       let walkoverType = 'wo';
                       if (match.score_detail) {
                         try {
                           const detail = JSON.parse(match.score_detail);
                           if (detail.walkover) {
-                            isWalkover = true;
                             walkoverType = detail.walkoverType || 'wo';
-                            scoreDisplay = walkoverType === 'ret' ? 'RET.' : 'W/O';
+                            if (walkoverType === 'ret') {
+                              const winnerId = match.winner_id;
+                              const isP1Winner = winnerId === match.player1_id;
+                              const setsStr = detail.sets && detail.sets.length > 0
+                                ? detail.sets.map(s => {
+                                    const g1 = s[0], g2 = s[1];
+                                    if (isP1Winner) return g1 + '-' + g2;
+                                    else return g2 + '-' + g1;
+                                  }).join(', ')
+                                : '0-0';
+                              scoreDisplay = setsStr + ' (RET.)';
+                            } else {
+                              scoreDisplay = 'W/O';
+                            }
                           } else if (detail.sets) {
-                            scoreDisplay = detail.sets.map(s => s.join('-')).join(', ');
+                            const winnerId = match.winner_id;
+                            const isP1Winner = winnerId === match.player1_id;
+                            scoreDisplay = detail.sets.map(s => {
+                              const g1 = s[0], g2 = s[1];
+                              if (isP1Winner) return g1 + '-' + g2;
+                              else return g2 + '-' + g1;
+                            }).join(', ');
                           }
                         } catch(e) {}
                       }
@@ -161,9 +229,7 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                           </td>
                           <td className="text-center" style={{ width: 300 }}>
                             {isFinished ? (
-                              <span className="fw-bold" style={{
-                                color: isWalkover && walkoverType === 'ret' ? '#E57373' : '#7B1FA2'
-                              }}>
+                              <span className="fw-bold" style={{ color: walkoverType === 'ret' ? '#E57373' : '#7B1FA2' }}>
                                 {scoreDisplay}
                               </span>
                             ) : (
@@ -178,7 +244,6 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
               </div>
             )}
 
-            {/* 排名表 */}
             <div className="card-footer bg-white border-0 px-3 pb-3">
               <h6 className="fw-bold mb-2" style={{ color: '#333', fontSize: '1.2rem'}}>当前排名</h6>
               <table className="table table-sm table-borderless align-middle">
@@ -186,6 +251,7 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                   <tr>
                     <th className="text-center">#</th>
                     <th>选手</th>
+                    <th className="text-center">胜负场</th>
                     <th className="text-center">胜负盘</th>
                     <th className="text-center">胜盘率</th>
                     <th className="text-center">胜负局</th>
@@ -207,6 +273,7 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                         <tr key={member.player_id} style={{ backgroundColor: idx % 2 === 0 ? '#fafafa' : '#fff' }}>
                           <td className="text-center fw-bold" style={{ color: '#7B1FA2' }}>{currentRank}</td>
                           <td>{member.player_name}{member.player_seed ? `[${member.player_seed}]` : ''}</td>
+                          <td className="text-center">{stats.winMatches}-{stats.lostMatches}</td>
                           <td className="text-center">{stats.winSets}-{stats.lostSets}</td>
                           <td className="text-center">{stats.setWinRate}</td>
                           <td className="text-center">{stats.winGames}-{stats.lostGames}</td>

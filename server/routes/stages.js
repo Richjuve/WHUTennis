@@ -10,10 +10,10 @@ router.get('/by-tournament/:id', (req, res) => {
 
 router.post('/', auth, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ error: '仅管理员' });
-  const { tournament_id, name, type } = req.body;
+  const { tournament_id, name, type, games_per_set } = req.body;
   const order = db.prepare('SELECT MAX(order_index) as max FROM stages WHERE tournament_id = ?').get(tournament_id).max || 0;
-  const info = db.prepare('INSERT INTO stages (tournament_id, name, type, order_index) VALUES (?,?,?,?)')
-    .run(tournament_id, name, type, order + 1);
+  const info = db.prepare('INSERT INTO stages (tournament_id, name, type, order_index, games_per_set) VALUES (?,?,?,?,?)')
+    .run(tournament_id, name, type, order + 1, games_per_set || 6);
   res.json({ id: info.lastInsertRowid });
 });
 

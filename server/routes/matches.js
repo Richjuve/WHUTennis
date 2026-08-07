@@ -32,7 +32,7 @@ router.put('/:id/players', auth, (req, res) => {
 });
 
 router.put('/:id', auth, async (req, res) => {
-  const { score_detail, court, referee_name, status, walkover_type } = req.body;
+  const { score_detail, court, referee_name, notes, status, walkover_type } = req.body;
   const match = db.prepare('SELECT * FROM matches WHERE id = ?').get(req.params.id);
   if (!match) return res.status(404).json({ error: '比赛不存在' });
 
@@ -55,8 +55,8 @@ router.put('/:id', auth, async (req, res) => {
     } catch(e) {}
   }
 
-  db.prepare(`UPDATE matches SET score_detail=?, court=?, referee_name=?, status=?, walkover_type=?, winner_id=? WHERE id=?`)
-    .run(score_detail || null, court || null, referee_name || null, status || 'finished', walkover_type || null, winner_id, req.params.id);
+  db.prepare(`UPDATE matches SET score_detail=?, court=?, referee_name=?, notes=?, status=?, walkover_type=?, winner_id=? WHERE id=?`)
+    .run(score_detail || null, court || null, referee_name || null, notes || null, status || 'finished', walkover_type || null, winner_id, req.params.id);
 
   res.json({ success: true });
 });
