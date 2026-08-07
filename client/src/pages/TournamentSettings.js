@@ -9,6 +9,8 @@ export default function TournamentSettings() {
   const [tournaments, setTournaments] = useState([]);
   const [name, setName] = useState('');
   const [config, setConfig] = useState({ bestOfSets: 1 });
+  const [editingNameId, setEditingNameId] = useState(null);
+  const [editName, setEditName] = useState('');
 
   const fetch = () => {
     axios.get('/api/tournaments').then(res => setTournaments(res.data));
@@ -65,6 +67,22 @@ export default function TournamentSettings() {
     }
   };
 
+  const saveTournamentName = async (id) => {
+    if (!editName.trim()) {
+      setEditingNameId(null);
+      return;
+    }
+    try {
+      await axios.put(`/api/tournaments/${id}`, { name: editName.trim() }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      fetch();
+    } catch (err) {
+      alert('修改失败');
+    }
+    setEditingNameId(null);
+  };
+
   return (
     <div>
       <h5>比赛列表</h5>
@@ -110,8 +128,28 @@ export default function TournamentSettings() {
           {tournaments.map(t => {
             const cfg = JSON.parse(t.scoring_config);
             return (
-              <tr key={t.id}>
-                <td>{t.name}</td>
+              <tr key={t.id} className="align-middle">
+                <td>
+                  {editingNameId === t.id ? (
+                    <input
+                      className="form-control form-control-sm"
+                      value={editName}
+                      onChange={e => setEditName(e.target.value)}
+                      onBlur={() => saveTournamentName(t.id)}
+                      onKeyDown={e => e.key === 'Enter' && saveTournamentName(t.id)}
+                      autoFocus
+                      style={{ width: 200 }}
+                    />
+                  ) : (
+                    <span
+                      onClick={() => { setEditingNameId(t.id); setEditName(t.name); }}
+                      style={{ cursor: 'pointer' }}
+                      title="点击修改比赛名称"
+                    >
+                      {t.name}
+                    </span>
+                  )}
+                </td>
                 <td>
                   {user?.role === 'admin' ? (
                     <select
