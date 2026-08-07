@@ -177,3 +177,42 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* 响应式优化 */
+@media (max-width: 768px) {
+  /* 表格横向滚动，避免撑破布局 */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  /* 缩小字体，防止换行 */
+  body {
+    font-size: 14px;
+  }
+
+  /* 弹窗全宽显示，保留边距 */
+  .modal-dialog {
+    max-width: 95% !important;
+    margin: 10px auto;
+  }
+
+  /* 按钮在小屏幕上更易点击 */
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* 卡片内边距适当缩小 */
+  .card-body {
+    padding: 1rem;
+  }
+
+  /* 导航栏固定避免遮挡内容 */
+  .navbar-custom {
+    position: sticky;
+    top: 0;
+  }
+  .container.mt-4 {
+    margin-top: 70px !important;
+  }
+}
+
