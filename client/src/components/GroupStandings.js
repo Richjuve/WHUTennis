@@ -37,7 +37,7 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
     });
   }, [stageId]);
 
-  const calcPlayerStats = (playerId, groupId) => {
+  const calcPlayerStats = (playerId, groupId, bestOfSets) => {
     const playerMatches = matches.filter(m =>
       m.group_id === groupId &&
       (m.player1_id === playerId || m.player2_id === playerId) &&
@@ -64,29 +64,10 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
 
         if (detail.walkover) {
           if (detail.walkoverType === 'ret') {
-            let hasCompletedSet = false;
-            if (detail.sets && detail.sets.length > 0) {
-              detail.sets.forEach((set, idx) => {
-                const rawG1 = String(set[0]).replace(/\(.*\)/, '');
-                const rawG2 = String(set[1]).replace(/\(.*\)/, '');
-                const g1 = parseInt(rawG1) || 0;
-                const g2 = parseInt(rawG2) || 0;
-                if (isNaN(g1) || isNaN(g2)) return;
-                const myGames = isPlayer1 ? g1 : g2;
-                const oppGames = isPlayer1 ? g2 : g1;
-                winGames += myGames;
-                lostGames += oppGames;
-                if (idx < detail.sets.length - 1) {
-                  if (myGames > oppGames) winSets++;
-                  else lostSets++;
-                  hasCompletedSet = true;
-                }
-              });
-            }
-            if (hasCompletedSet) {
-              if (iWin) winSets++;
-              else lostSets++;
-            }
+            const setsToWin = Math.ceil(bestOfSets / 2);
+            if (iWin) winSets += setsToWin;
+            else lostSets += setsToWin;
+            return;
           } else {
             if (iWin) {
               winSets += 1;
@@ -95,8 +76,8 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
               lostSets += 1;
               lostGames += gamesPerSet;
             }
+            return;
           }
-          return;
         }
 
         if (detail.sets) {
@@ -268,7 +249,7 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
                     })
                     .map((member, idx) => {
                       const currentRank = rankings[group.id]?.find(r => r.player_id === member.player_id)?.rank || '-';
-                      const stats = calcPlayerStats(member.player_id, group.id);
+                      const stats = calcPlayerStats(member.player_id, group.id, tournamentConfig?.bestOfSets || 3);
                       return (
                         <tr key={member.player_id} style={{ backgroundColor: idx % 2 === 0 ? '#fafafa' : '#fff' }}>
                           <td className="text-center fw-bold" style={{ color: '#7B1FA2' }}>{currentRank}</td>

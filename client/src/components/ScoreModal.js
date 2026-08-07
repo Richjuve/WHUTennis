@@ -99,42 +99,36 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
   const formatSetsDisplay = () => {
     if (walkover) {
       if (walkoverType === 'ret') {
-        const winnerId = match.winner_id;
-        const isP1Winner = winnerId === match.player1_id;
         const setsStr = sets
           .filter(s => s[0] !== '' || s[1] !== '')
           .map(s => {
             const g1 = s[0] !== '' ? s[0] : '0';
             const g2 = s[1] !== '' ? s[1] : '0';
-            if (isP1Winner) return g1 + '-' + g2;
-            else return g2 + '-' + g1;
+            return g1 + '-' + g2;
           })
           .join(', ');
         return (setsStr || '0-0') + ' (RET.)';
       }
       return 'W/O';
     }
-    const winnerId = match.winner_id;
-    const isP1Winner = winnerId === match.player1_id;
-    const display = sets
+    return sets
       .filter(s => s[0] !== '' || s[1] !== '')
       .map(s => {
         const g1 = s[0] !== '' ? s[0] : '0';
         const g2 = s[1] !== '' ? s[1] : '0';
-        if (isP1Winner) return g1 + '-' + g2;
-        else return g2 + '-' + g1;
+        return g1 + '-' + g2;
       })
-      .join(', ');
-    return display || '未录入';
+      .join(', ') || '未录入';
   };
 
   return (
     <Modal 
       show={show} 
       onHide={onHide} 
-      size="md" 
+      size="lg" 
       centered
       contentClassName="border-0 shadow-lg rounded-4"
+      dialogClassName="modal-dialog-centered"
     >
       <Modal.Header closeButton className="border-0 pb-0">
         <Modal.Title className="fw-bold" style={{ color: '#7B1FA2' }}>
@@ -143,35 +137,24 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
       </Modal.Header>
       <Modal.Body className="pt-2">
         {!editing ? (
-          <div className="p-3 bg-light rounded-3">
-            <div className="mb-3 text-center">
-              <div className="d-flex justify-content-center align-items-center gap-3">
-                <span className={match.winner_id === match.player1_id ? 'fw-bold' : ''} 
-                  style={{ 
-                    color: match.winner_id === match.player1_id ? '#7B1FA2' : '#333',
-                    fontSize: '1.1rem'
-                  }}>
-                  {match.player1_name}{match.player1_seed ? `[${match.player1_seed}]` : ''}
-                </span>
-                <span className="badge bg-light text-dark px-3 py-2 rounded-pill">VS</span>
-                <span className={match.winner_id === match.player2_id ? 'fw-bold' : ''} 
-                  style={{ 
-                    color: match.winner_id === match.player2_id ? '#7B1FA2' : '#333',
-                    fontSize: '1.1rem'
-                  }}>
-                  {match.player2_name}{match.player2_seed ? `[${match.player2_seed}]` : ''}
-                </span>
-              </div>
-            </div>
-            
-            <div className="text-center mb-3">
-              <div className="d-inline-block bg-white rounded-3 px-4 py-2 shadow-sm">
+          <div className="p-4 bg-light rounded-3 d-flex flex-column align-items-center justify-content-center" style={{ minHeight: '120px' }}>
+            <div className="d-flex align-items-center gap-4 mb-3">
+              <span className="fw-bold" style={{ color: '#7B1FA2', fontSize: '1.2rem' }}>
+                {match.winner_id === match.player1_id
+                  ? match.player1_name + (match.player1_seed ? `[${match.player1_seed}]` : '')
+                  : match.player2_name + (match.player2_seed ? `[${match.player2_seed}]` : '')}
+              </span>
+              <div className="bg-white rounded-3 px-4 py-2 shadow-sm">
                 <span className="fw-bold fs-5" style={{ color: '#7B1FA2' }}>
                   {hasExistingScore ? formatSetsDisplay() : '未录入'}
                 </span>
               </div>
+              <span style={{ fontSize: '1.2rem' }}>
+                {match.winner_id === match.player1_id
+                  ? match.player2_name + (match.player2_seed ? `[${match.player2_seed}]` : '')
+                  : match.player1_name + (match.player1_seed ? `[${match.player1_seed}]` : '')}
+              </span>
             </div>
-            
             {(court || referee || notes) && (
               <div className="d-flex justify-content-center gap-3 text-muted small">
                 {court && <span>📍 {court}</span>}
