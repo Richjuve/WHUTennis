@@ -133,6 +133,17 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
 
   const getGroupMatches = (groupId) => matches.filter(m => m.group_id === groupId);
 
+  const formatScore = (score) => {
+    const str = String(score);
+    const m = str.match(/^(\d+)\((\d+)\)$/);
+    if (m) {
+      const superscripts = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+      const sup = m[2].split('').map(c => superscripts[c] || c).join('');
+      return <span>{m[1]}<sup style={{ fontSize: '0.85em' }}>{sup}</sup></span>;
+    }
+    return str;
+  };
+
   return (
     <div>
       {groups.map(group => {
@@ -147,81 +158,115 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
             </div>
 
             {groupMatches.length > 0 && (
-              <div className="table-responsive px-3">
-                <table className="table table-borderless table-sm align-middle">
-                  <thead className="text-muted" style={{ fontSize: '0.8rem' }}>
-                    <tr>
-                      <th>选手A</th>
-                      <th>选手B</th>
-                      <th className="text-center" style={{ width: 100 }}>比分</th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ fontSize: '0.9rem' }}>
-                    {groupMatches.map(match => {
-                      let scoreDisplay = '-';
-                      let walkoverType = 'wo';
-                      if (match.score_detail) {
-                        try {
-                          const detail = JSON.parse(match.score_detail);
-                          if (detail.walkover) {
-                            walkoverType = detail.walkoverType || 'wo';
-                            if (walkoverType === 'ret') {
-                              const winnerId = match.winner_id;
-                              const isP1Winner = winnerId === match.player1_id;
-                              const setsStr = detail.sets && detail.sets.length > 0
-                                ? detail.sets.map(s => {
-                                    const g1 = s[0], g2 = s[1];
-                                    if (isP1Winner) return g1 + '-' + g2;
-                                    else return g2 + '-' + g1;
-                                  }).join(', ')
-                                : '0-0';
-                              scoreDisplay = setsStr + ' (RET.)';
-                            } else {
-                              scoreDisplay = 'W/O';
-                            }
-                          } else if (detail.sets) {
-                            const winnerId = match.winner_id;
-                            const isP1Winner = winnerId === match.player1_id;
-                            scoreDisplay = detail.sets.map(s => {
-                              const g1 = s[0], g2 = s[1];
-                              if (isP1Winner) return g1 + '-' + g2;
-                              else return g2 + '-' + g1;
-                            }).join(', ');
-                          }
-                        } catch(e) {}
-                      }
-                      const isFinished = match.status === 'finished';
-                      const p1Winner = match.winner_id === match.player1_id;
-                      const p2Winner = match.winner_id === match.player2_id;
+              <div className="px-3 pt-2">
+                <div className="row g-2">
+                  {groupMatches.map(match => {
+                    let sets = [];
+                    let walkover = false;
+                    let walkoverType = 'wo';
 
-                      return (
-                        <tr
-                          key={match.id}
+                    if (match.score_detail) {
+                      try {
+                        const detail = JSON.parse(match.score_detail);
+                        if (detail.walkover) {
+                          walkover = true;
+                          walkoverType = detail.walkoverType || 'wo';
+                        } else if (detail.sets) {
+                          sets = detail.sets;
+                        }
+                      } catch(e) {}
+                    }
+
+                    const p1Name = `${match.player1_name || 'TBD'}${match.player1_seed ? `[${match.player1_seed}]` : ''}`;
+                    const p2Name = `${match.player2_name || 'TBD'}${match.player2_seed ? `[${match.player2_seed}]` : ''}`;
+                    const p1Winner = match.winner_id === match.player1_id;
+                    const p2Winner = match.winner_id === match.player2_id;
+                    const isFinished = match.status === 'finished';
+
+                    return (
+                      <div key={match.id} className="col-12 col-md-6">
+                        <div
+                          className={`border p-3 bg-white rounded-3`}
+                          style={{
+                            cursor: user ? 'pointer' : 'default',
+                            boxShadow: isFinished && (p1Winner || p2Winner) ? '0 2px 12px rgba(123, 31, 162, 0.1)' : '0 1px 3px rgba(0,0,0,0.05)',
+                            borderLeft: isFinished && (p1Winner || p2Winner) ? '4px solid #7B1FA2' : '1px solid #e0e0e0',
+                            transition: 'all 0.2s',
+                            minHeight: '60px'
+                          }}
                           onClick={() => handleMatchClick(match)}
-                          style={{ cursor: user ? 'pointer' : 'default', borderBottom: '1px solid #f0f0f0' }}
+                          title={user ? (isFinished ? '点击查看/编辑比分' : '点击录入比分') : ''}
                         >
-                          <td className={p1Winner ? 'fw-bold' : ''}
-                            style={{ color: p1Winner ? '#7B1FA2' : '#333' }}>
-                            {match.player1_name}{match.player1_seed ? `[${match.player1_seed}]` : ''}
-                          </td>
-                          <td className={p2Winner ? 'fw-bold' : ''}
-                            style={{ color: p2Winner ? '#7B1FA2' : '#333' }}>
-                            {match.player2_name}{match.player2_seed ? `[${match.player2_seed}]` : ''}
-                          </td>
-                          <td className="text-center" style={{ width: 300 }}>
-                            {isFinished ? (
-                              <span className="fw-bold" style={{ color: walkoverType === 'ret' ? '#E57373' : '#7B1FA2' }}>
-                                {scoreDisplay}
-                              </span>
-                            ) : (
-                              <span className="text-muted">-</span>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                          <table className="mb-0" style={{ fontSize: '1.0rem', width: '100%' }}>
+                            <tbody>
+                              <tr>
+                                <td
+                                  className={`py-1 text-nowrap ${p1Winner ? 'fw-bold' : ''}`}
+                                  style={{
+                                    paddingRight: 12, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis',
+                                    color: p1Winner ? '#7B1FA2' : '#333'
+                                  }}
+                                >
+                                  {p1Name}
+                                </td>
+                                {sets.map((set, idx) => {
+                                  const g1 = parseInt(set[0]);
+                                  const g2 = parseInt(set[1]);
+                                  const p1WonSet = !isNaN(g1) && !isNaN(g2) && g1 > g2;
+                                  return (
+                                    <td key={idx} className={`text-center px-0 py-1 ${p1WonSet ? 'fw-bold' : ''}`}
+                                      style={{ width: 32, color: p1WonSet ? '#7B1FA2' : '#333', fontSize: '1.0rem', fontFamily: '"Futura", system-ui, -apple-system, sans-serif' }}>
+                                      {formatScore(set[0])}
+                                    </td>
+                                  );
+                                })}
+                                {walkover && walkoverType === 'wo' && p1Winner && (
+                                  <td className="text-center fw-bold" style={{ width: 40, color: '#7B1FA2', fontFamily: '"Futura", "Segoe UI", system-ui, -apple-system, sans-serif'}}>W/O</td>
+                                )}
+                                {walkover && walkoverType === 'ret' && !p1Winner && (
+                                  <td className="text-center fw-bold" style={{ width: 40, color: '#E57373', fontFamily: '"Futura", "Segoe UI", system-ui, -apple-system, sans-serif'}}>RET.</td>
+                                )}
+                                {walkover && walkoverType === 'wo' && !p1Winner && <td style={{ width: 40 }}></td>}
+                                {walkover && walkoverType === 'ret' && p1Winner && <td style={{ width: 40 }}></td>}
+                                {!walkover && !isFinished && <td className="text-center text-muted" style={{ width: 32 }}>-</td>}
+                              </tr>
+                              <tr>
+                                <td
+                                  className={`py-1 text-nowrap ${p2Winner ? 'fw-bold' : ''}`}
+                                  style={{
+                                    paddingRight: 12, maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis',
+                                    color: p2Winner ? '#7B1FA2' : '#333'
+                                  }}
+                                >
+                                  {p2Name}
+                                </td>
+                                {sets.map((set, idx) => {
+                                  const g1 = parseInt(set[0]);
+                                  const g2 = parseInt(set[1]);
+                                  const p2WonSet = !isNaN(g1) && !isNaN(g2) && g2 > g1;
+                                  return (
+                                    <td key={idx} className={`text-center px-0 py-1 ${p2WonSet ? 'fw-bold' : ''}`}
+                                      style={{ width: 32, color: p2WonSet ? '#7B1FA2' : '#333', fontSize: '1.0rem', fontFamily: '"Futura", system-ui, -apple-system, sans-serif' }}>
+                                      {formatScore(set[1])}
+                                    </td>
+                                  );
+                                })}
+                                {walkover && walkoverType === 'wo' && p2Winner && (
+                                  <td className="text-center fw-bold" style={{ width: 40, color: '#7B1FA2', fontFamily: '"Futura", "Segoe UI", system-ui, -apple-system, sans-serif'}}>W/O</td>
+                                )}
+                                {walkover && walkoverType === 'ret' && !p2Winner && (
+                                  <td className="text-center fw-bold" style={{ width: 40, color: '#E57373', fontFamily: '"Futura", "Segoe UI", system-ui, -apple-system, sans-serif'}}>RET.</td>
+                                )}
+                                {walkover && walkoverType === 'wo' && !p2Winner && <td style={{ width: 40 }}></td>}
+                                {walkover && walkoverType === 'ret' && p2Winner && <td style={{ width: 40 }}></td>}
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 

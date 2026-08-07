@@ -62,7 +62,7 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
       if (match) {
         const superscripts = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
         const sup = match[2].split('').map(c => superscripts[c] || c).join('');
-        return <span>{match[1]}<sup style={{ fontSize: '0.75em' }}>{sup}</sup></span>;
+        return <span>{match[1]}<sup style={{ fontSize: '0.85em' }}>{sup}</sup></span>;
       }
       return str;
     };
@@ -80,7 +80,7 @@ export default function KnockoutBracket({ stageId, matches, user, onUpdate, tour
         onClick={() => handleSelectMatch(match)}
         title={user ? (isFinished ? '点击查看/编辑比分' : '点击录入比分') : ''}
       >
-        <table className="mb-0" style={{ fontSize: '0.85rem', width: '100%' }}>
+        <table className="mb-0" style={{ fontSize: '1.0rem', width: '100%' }}>
           <tbody>
             <tr>
               <td
