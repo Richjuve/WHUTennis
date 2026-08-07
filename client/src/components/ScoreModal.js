@@ -97,13 +97,15 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
   };
 
   const formatSetsDisplay = () => {
+    const isPlayer1Winner = match.winner_id === match.player1_id;
     if (walkover) {
       if (walkoverType === 'ret') {
         const setsStr = sets
           .filter(s => s[0] !== '' || s[1] !== '')
           .map(s => {
-            const g1 = s[0] !== '' ? s[0] : '0';
-            const g2 = s[1] !== '' ? s[1] : '0';
+            let g1 = s[0] !== '' ? s[0] : '0';
+            let g2 = s[1] !== '' ? s[1] : '0';
+            if (!isPlayer1Winner) [g1, g2] = [g2, g1];
             return g1 + '-' + g2;
           })
           .join(', ');
@@ -114,8 +116,9 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
     return sets
       .filter(s => s[0] !== '' || s[1] !== '')
       .map(s => {
-        const g1 = s[0] !== '' ? s[0] : '0';
-        const g2 = s[1] !== '' ? s[1] : '0';
+        let g1 = s[0] !== '' ? s[0] : '0';
+        let g2 = s[1] !== '' ? s[1] : '0';
+        if (!isPlayer1Winner) [g1, g2] = [g2, g1];
         return g1 + '-' + g2;
       })
       .join(', ') || '未录入';
