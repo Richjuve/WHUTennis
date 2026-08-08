@@ -118,10 +118,10 @@ export default function TournamentSettings() {
       <table className="table">
         <thead>
           <tr>
-            <th>名称</th>
-            <th>状态</th>
-            <th>赛制</th>
-            <th>操作</th>
+            <th className="text-nowrap">名称</th>
+            <th className="text-nowrap">状态</th>
+            <th className="text-nowrap">赛制</th>
+            <th className="text-nowrap">操作</th>
           </tr>
         </thead>
         <tbody>
@@ -156,7 +156,7 @@ export default function TournamentSettings() {
                       className="form-select form-select-sm"
                       value={t.status}
                       onChange={e => changeStatus(t.id, e.target.value)}
-                      style={{ width: 120 }}
+                      style={{ width: 110 }}
                     >
                       <option value="upcoming">即将开始</option>
                       <option value="ongoing">进行中</option>
@@ -166,8 +166,8 @@ export default function TournamentSettings() {
                     getStatusBadge(t.status)
                   )}
                 </td>
-                <td>{cfg.bestOfSets}盘</td>
-                <td>
+                <td className="text-nowrap">{cfg.bestOfSets}盘</td>
+                <td className="text-nowrap">
                   <button
                     className="btn btn-outline-primary btn-sm me-1"
                     onClick={() => navigate(`/admin/stages/${t.id}`)}
@@ -182,7 +182,7 @@ export default function TournamentSettings() {
                   </button>
                   {user?.role === 'admin' && (
                     <button
-                      className="btn btn-outline-danger btn-sm"
+                      className="btn btn-outline-danger btn-sm me-1"
                       onClick={() => deleteTournament(t.id)}
                     >
                       删除

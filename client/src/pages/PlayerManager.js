@@ -347,13 +347,13 @@ export default function PlayerManager() {
                         onChange={toggleSelectAll}
                       />
                     </th>
-                    <th>姓名</th>
-                    <th>性别</th>
-                    <th>学号</th>
-                    <th>学院</th>
-                    <th>电话</th>
-                    <th>种子</th>
-                    <th>操作</th>
+                    <th className="text-nowrap">姓名</th>
+                    <th className="text-nowrap">性别</th>
+                    <th className="text-nowrap">学号</th>
+                    <th className="text-nowrap">学院</th>
+                    <th className="text-nowrap">电话</th>
+                    <th className="text-nowrap">种子</th>
+                    <th className="text-nowrap">操作</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -387,17 +387,17 @@ export default function PlayerManager() {
                         </>
                       ) : (
                         <>
-                          <td>
+                          <td className="text-nowrap">
                             <span>{p.name}{p.seed ? `[${p.seed}]` : ''}</span>
                           </td>
-                          <td>{p.gender || '-'}</td>
-                          <td>{p.student_id || '-'}</td>
-                          <td>{p.college || '-'}</td>
-                          <td>{p.phone || '-'}</td>
-                          <td>{p.seed || '-'}</td>
-                          <td>
+                          <td className="text-nowrap">{p.gender || '-'}</td>
+                          <td className="text-nowrap">{p.student_id || '-'}</td>
+                          <td className="text-nowrap">{p.college || '-'}</td>
+                          <td className="text-nowrap">{p.phone || '-'}</td>
+                          <td className="text-nowrap">{p.seed || '-'}</td>
+                          <td className="text-nowrap">
                             <button className="btn btn-outline-primary btn-sm me-1" onClick={() => startEdit(p)}>编辑</button>
-                            <button className="btn btn-outline-danger btn-sm" onClick={() => deletePlayer(p.id)}>删除</button>
+                            <button className="btn btn-outline-danger btn-sm me-1" onClick={() => deletePlayer(p.id)}>删除</button>
                           </td>
                         </>
                       )}
