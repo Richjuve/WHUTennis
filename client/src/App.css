@@ -176,6 +176,12 @@ body {
   font-size: 0.85rem;
 }
 
+/* ========== 复选框/开关 ========== */
+.form-check-input:checked {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}
+
 /* ========== 徽章 ========== */
 .badge {
   font-weight: 500;
@@ -245,5 +251,22 @@ body {
   .btn {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .navbar-custom .btn {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  .navbar-custom .me-3 {
+    margin-right: 0.5rem !important;
+  }
+  .navbar-custom .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  .navbar-brand {
+    font-size: 1rem;
   }
 }

@@ -272,49 +272,51 @@ export default function GroupStandings({ stageId, matches, user, onUpdate, tourn
 
             <div className="card-footer bg-white border-0 px-3 pb-3">
               <h6 className="fw-bold mb-2" style={{ color: '#333', fontSize: '1.2rem'}}>当前排名</h6>
-              <table className="table table-sm table-borderless align-middle">
-                <thead className="text-muted" style={{ fontSize: '0.8rem' }}>
-                  <tr>
-                    <th className="text-center">#</th>
-                    <th>选手</th>
-                    <th className="text-center">胜负场</th>
-                    <th className="text-center">胜负盘</th>
-                    <th className="text-center">胜盘率</th>
-                    <th className="text-center">胜负局</th>
-                    <th className="text-center">胜局率</th>
-                    {user && <th className="text-center">调整</th>}
-                  </tr>
-                </thead>
-                <tbody style={{ fontSize: '0.9rem' }}>
-                  {(groupMembers[group.id] || [])
-                    .sort((a, b) => {
-                      const ra = rankings[group.id]?.find(r => r.player_id === a.player_id)?.rank || 999;
-                      const rb = rankings[group.id]?.find(r => r.player_id === b.player_id)?.rank || 999;
-                      return ra - rb;
-                    })
-                    .map((member, idx) => {
-                      const currentRank = rankings[group.id]?.find(r => r.player_id === member.player_id)?.rank || '-';
-                      const stats = calcPlayerStats(member.player_id, group.id, tournamentConfig?.bestOfSets || 3);
-                      return (
-                        <tr key={member.player_id} style={{ backgroundColor: idx % 2 === 0 ? '#fafafa' : '#fff' }}>
-                          <td className="text-center fw-bold" style={{ color: '#7B1FA2' }}>{currentRank}</td>
-                          <td>{member.player_name}{member.player_seed ? `[${member.player_seed}]` : ''}</td>
-                          <td className="text-center">{stats.winMatches}-{stats.lostMatches}</td>
-                          <td className="text-center">{stats.winSets}-{stats.lostSets}</td>
-                          <td className="text-center">{stats.setWinRate}</td>
-                          <td className="text-center">{stats.winGames}-{stats.lostGames}</td>
-                          <td className="text-center">{stats.gameWinRate}</td>
-                          {user && (
-                            <td className="text-center">
-                              <button className="btn btn-sm btn-outline-secondary me-1 py-0 px-1" onClick={() => moveRank(group.id, member.player_id, 'up')}>↑</button>
-                              <button className="btn btn-sm btn-outline-secondary py-0 px-1" onClick={() => moveRank(group.id, member.player_id, 'down')}>↓</button>
-                            </td>
-                          )}
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
+              <div className="table-responsive">
+                <table className="table table-sm table-borderless align-middle">
+                  <thead className="text-muted" style={{ fontSize: '0.8rem' }}>
+                    <tr>
+                      <th className="text-center text-nowrap">#</th>
+                      <th className="text-nowrap">选手</th>
+                      <th className="text-center text-nowrap">胜负场</th>
+                      <th className="text-center text-nowrap">胜负盘</th>
+                      <th className="text-center text-nowrap">胜盘率</th>
+                      <th className="text-center text-nowrap">胜负局</th>
+                      <th className="text-center text-nowrap">胜局率</th>
+                      {user && <th className="text-center text-nowrap">调整</th>}
+                    </tr>
+                  </thead>
+                  <tbody style={{ fontSize: '0.9rem' }}>
+                    {(groupMembers[group.id] || [])
+                      .sort((a, b) => {
+                        const ra = rankings[group.id]?.find(r => r.player_id === a.player_id)?.rank || 999;
+                        const rb = rankings[group.id]?.find(r => r.player_id === b.player_id)?.rank || 999;
+                        return ra - rb;
+                      })
+                      .map((member, idx) => {
+                        const currentRank = rankings[group.id]?.find(r => r.player_id === member.player_id)?.rank || '-';
+                        const stats = calcPlayerStats(member.player_id, group.id, tournamentConfig?.bestOfSets || 3);
+                        return (
+                          <tr key={member.player_id} style={{ backgroundColor: idx % 2 === 0 ? '#fafafa' : '#fff' }}>
+                            <td className="text-center fw-bold text-nowrap" style={{ color: '#7B1FA2' }}>{currentRank}</td>
+                            <td className="text-nowrap">{member.player_name}{member.player_seed ? `[${member.player_seed}]` : ''}</td>
+                            <td className="text-center text-nowrap">{stats.winMatches}-{stats.lostMatches}</td>
+                            <td className="text-center text-nowrap">{stats.winSets}-{stats.lostSets}</td>
+                            <td className="text-center text-nowrap">{stats.setWinRate}</td>
+                            <td className="text-center text-nowrap">{stats.winGames}-{stats.lostGames}</td>
+                            <td className="text-center text-nowrap">{stats.gameWinRate}</td>
+                            {user && (
+                              <td className="text-center text-nowrap">
+                                <button className="btn btn-sm btn-outline-secondary me-1 py-0 px-1" onClick={() => moveRank(group.id, member.player_id, 'up')}>↑</button>
+                                <button className="btn btn-sm btn-outline-secondary py-0 px-1" onClick={() => moveRank(group.id, member.player_id, 'down')}>↓</button>
+                              </td>
+                            )}
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         );
