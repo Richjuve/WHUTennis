@@ -59,8 +59,7 @@ export default function UserManager() {
         </div>
         <div className="col-md-2">
           <select className="form-select" value={role} onChange={e => setRole(e.target.value)}>
-            <option value="referee">裁判</option>
-            <option value="venue_manager">场地负责人</option>
+            <option value="referee">工作人员</option>
             <option value="admin">管理员</option>
           </select>
         </div>
@@ -83,7 +82,7 @@ export default function UserManager() {
               <tr key={u.id} className="align-middle text-nowrap">
                 <td>{u.name}</td>
                 <td>{u.student_id}</td>
-                <td>{u.role === 'admin' ? '管理员' : u.role === 'referee' ? '裁判' : '场地负责人'}</td>
+                <td>{u.role === 'admin' ? '管理员' : '工作人员'}</td>
                 <td>
                   <button className="btn btn-outline-danger btn-sm" onClick={() => deleteUser(u.id)}>删除</button>
                 </td>

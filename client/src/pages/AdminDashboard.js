@@ -27,7 +27,7 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h4>欢迎, {user.name} ({user.role === 'admin' ? '管理员' : user.role === 'referee' ? '裁判' : '场地负责人'})</h4>
+        <h4>欢迎, {user.name} ({user.role === 'admin' ? '管理员' : '工作人员'})</h4>
         {user.role === 'admin' && (
           <button className="btn btn-outline-primary btn-sm" onClick={handleBackup}>
             💾 备份
