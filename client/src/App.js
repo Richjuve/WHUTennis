@@ -30,10 +30,10 @@ function NavBar() {
           {user ? (
             <div className="d-flex align-items-center">
               <span className="me-3 small" style={{ color: '#555' }}>
-                {user.name} ({user.role === 'admin' ? '管理员' : user.role === 'referee' ? '裁判' : '场地负责人'})
+                {user.name}
               </span>
               <Button variant="primary" size="sm" onClick={handleLogout}>
-                退出登录
+                退出
               </Button>
             </div>
           ) : (
