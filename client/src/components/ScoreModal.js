@@ -241,7 +241,7 @@ export default function ScoreModal({ match, tournamentConfig, show, onHide, onSa
                 {sets.map((set, i) => (
                   <Row key={i} className="mb-2 align-items-center">
                     <Col xs={2}>
-                      <span className="small text-muted">第{i + 1}盘</span>
+                      <span className="small text-muted">#{i + 1}</span>
                     </Col>
                     <Col xs={5}>
                       <Form.Control

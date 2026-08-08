@@ -358,7 +358,7 @@ export default function PlayerManager() {
                 </thead>
                 <tbody>
                   {sortedPlayers.map(p => (
-                    <tr key={p.id} className={selectedIds.has(p.id) ? 'table-active' : ''}>
+                    <tr key={p.id} className={`${selectedIds.has(p.id) ? 'table-active' : ''} align-middle`}>
                       <td>
                         <input
                           type="checkbox"

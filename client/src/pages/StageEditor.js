@@ -539,6 +539,10 @@ function KnockoutEditor({ stageId, players, tournamentId }) {
                 type="checkbox"
                 checked={hasThirdPlace}
                 onChange={toggleThirdPlace}
+                style={{ 
+                  backgroundColor: hasThirdPlace ? '#7B1FA2' : undefined,
+                  borderColor: hasThirdPlace ? '#7B1FA2' : undefined
+                }}
               />
               <label className="form-check-label small">季军赛</label>
             </div>
@@ -547,7 +551,7 @@ function KnockoutEditor({ stageId, players, tournamentId }) {
         {/* 轮次命名 */}
         {mainRounds.length > 0 && (
           <div className="d-flex flex-wrap gap-2 mt-2">
-            <span className="small text-muted">轮次命名：</span>
+            <span className="small text-muted align-self-center">轮次命名：</span>
             {mainRounds.map(r => (
               <div key={r} className="input-group input-group-sm" style={{ width: 160 }}>
                 <span className="input-group-text">第{r}轮</span>
@@ -608,7 +612,7 @@ function KnockoutEditor({ stageId, players, tournamentId }) {
                         ))}
                       </select>
                     </td>
-                    <td>{match.status === 'finished' ? '✅ 已结束' : match.status === 'scheduled' ? '未开始' : match.status}</td>
+                    <td className="align-middle">{match.status === 'finished' ? '已结束' : match.status === 'scheduled' ? '未开始' : match.status}</td>
                     <td>
                       <button className="btn btn-sm btn-danger" onClick={() => deleteMatch(match.id)}>删除</button>
                     </td>

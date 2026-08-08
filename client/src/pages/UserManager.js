@@ -80,7 +80,7 @@ export default function UserManager() {
         </thead>
         <tbody>
           {users.map(u => (
-            <tr key={u.id}>
+            <tr key={u.id} className="align-middle">
               <td>{u.name}</td>
               <td>{u.student_id}</td>
               <td>{u.role === 'admin' ? '管理员' : u.role === 'referee' ? '裁判' : '场地负责人'}</td>
