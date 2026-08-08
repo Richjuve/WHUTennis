@@ -309,7 +309,7 @@ export default function PlayerManager() {
               <span className="small text-muted">排序：</span>
               <select
                 className="form-select form-select-sm"
-                style={{ width: 100 }}
+                style={{ width: 110 }}
                 value={sortField}
                 onChange={e => setSortField(e.target.value)}
               >

@@ -114,91 +114,93 @@ export default function TournamentSettings() {
           </div>
         </form>
       )}
-
-      <table className="table">
-        <thead>
-          <tr>
-            <th className="text-nowrap">名称</th>
-            <th className="text-nowrap">状态</th>
-            <th className="text-nowrap">赛制</th>
-            <th className="text-nowrap">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tournaments.map(t => {
-            const cfg = JSON.parse(t.scoring_config);
-            return (
-              <tr key={t.id} className="align-middle">
-                <td>
-                  {editingNameId === t.id ? (
-                    <input
-                      className="form-control form-control-sm"
-                      value={editName}
-                      onChange={e => setEditName(e.target.value)}
-                      onBlur={() => saveTournamentName(t.id)}
-                      onKeyDown={e => e.key === 'Enter' && saveTournamentName(t.id)}
-                      autoFocus
-                      style={{ width: 200 }}
-                    />
-                  ) : (
-                    <span
-                      onClick={() => { setEditingNameId(t.id); setEditName(t.name); }}
-                      style={{ cursor: 'pointer' }}
-                      title="点击修改比赛名称"
-                    >
-                      {t.name}
-                    </span>
-                  )}
-                </td>
-                <td>
-                  {user?.role === 'admin' ? (
-                    <select
-                      className="form-select form-select-sm"
-                      value={t.status}
-                      onChange={e => changeStatus(t.id, e.target.value)}
-                      style={{ width: 110 }}
-                    >
-                      <option value="upcoming">即将开始</option>
-                      <option value="ongoing">进行中</option>
-                      <option value="finished">已结束</option>
-                    </select>
-                  ) : (
-                    getStatusBadge(t.status)
-                  )}
-                </td>
-                <td className="text-nowrap">{cfg.bestOfSets}盘</td>
-                <td className="text-nowrap">
-                  <button
-                    className="btn btn-outline-primary btn-sm me-1"
-                    onClick={() => navigate(`/admin/stages/${t.id}`)}
-                  >
-                    管理阶段
-                  </button>
-                  <button
-                    className="btn btn-outline-secondary btn-sm me-1"
-                    onClick={() => navigate('/admin/players')}
-                  >
-                    选手库
-                  </button>
-                  {user?.role === 'admin' && (
-                    <button
-                      className="btn btn-outline-danger btn-sm me-1"
-                      onClick={() => deleteTournament(t.id)}
-                    >
-                      删除
-                    </button>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-          {tournaments.length === 0 && (
+      <div className="table-responsive">
+        <table className="table">
+          <thead>
             <tr>
-              <td colSpan={4} className="text-center text-muted">暂无比赛</td>
+              <th className="text-nowrap">名称</th>
+              <th className="text-nowrap">状态</th>
+              <th className="text-nowrap">赛制</th>
+              <th className="text-nowrap">操作</th>
             </tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {tournaments.map(t => {
+              const cfg = JSON.parse(t.scoring_config);
+              return (
+                <tr key={t.id} className="align-middle">
+                  <td>
+                    {editingNameId === t.id ? (
+                      <input
+                        className="form-control form-control-sm"
+                        value={editName}
+                        onChange={e => setEditName(e.target.value)}
+                        onBlur={() => saveTournamentName(t.id)}
+                        onKeyDown={e => e.key === 'Enter' && saveTournamentName(t.id)}
+                        autoFocus
+                        style={{ width: 200 }}
+                      />
+                    ) : (
+                      <span
+                        onClick={() => { setEditingNameId(t.id); setEditName(t.name); }}
+                        style={{ cursor: 'pointer' }}
+                        className="text-nowrap"
+                        title="点击修改比赛名称"
+                      >
+                        {t.name}
+                      </span>
+                    )}
+                  </td>
+                  <td>
+                    {user?.role === 'admin' ? (
+                      <select
+                        className="form-select form-select-sm"
+                        value={t.status}
+                        onChange={e => changeStatus(t.id, e.target.value)}
+                        style={{ width: 110 }}
+                      >
+                        <option value="upcoming">即将开始</option>
+                        <option value="ongoing">进行中</option>
+                        <option value="finished">已结束</option>
+                      </select>
+                    ) : (
+                      getStatusBadge(t.status)
+                    )}
+                  </td>
+                  <td className="text-nowrap">{cfg.bestOfSets}盘</td>
+                  <td className="text-nowrap">
+                    <button
+                      className="btn btn-outline-primary btn-sm me-1"
+                      onClick={() => navigate(`/admin/stages/${t.id}`)}
+                    >
+                      管理阶段
+                    </button>
+                    <button
+                      className="btn btn-outline-secondary btn-sm me-1"
+                      onClick={() => navigate('/admin/players')}
+                    >
+                      选手库
+                    </button>
+                    {user?.role === 'admin' && (
+                      <button
+                        className="btn btn-outline-danger btn-sm me-1"
+                        onClick={() => deleteTournament(t.id)}
+                      >
+                        删除
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+            {tournaments.length === 0 && (
+              <tr>
+                <td colSpan={4} className="text-center text-muted">暂无比赛</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

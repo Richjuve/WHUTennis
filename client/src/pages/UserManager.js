@@ -68,32 +68,33 @@ export default function UserManager() {
           <button className="btn btn-primary" type="submit">创建用户</button>
         </div>
       </form>
-
-      <table className="table table-sm">
-        <thead>
-          <tr>
-            <th>姓名</th>
-            <th>学号</th>
-            <th>角色</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map(u => (
-            <tr key={u.id} className="align-middle">
-              <td>{u.name}</td>
-              <td>{u.student_id}</td>
-              <td>{u.role === 'admin' ? '管理员' : u.role === 'referee' ? '裁判' : '场地负责人'}</td>
-              <td>
-                <button className="btn btn-outline-danger btn-sm" onClick={() => deleteUser(u.id)}>删除</button>
-              </td>
+      <div className="table-responsive">
+        <table className="table table-sm">
+          <thead>
+            <tr className="text-nowrap">
+              <th>姓名</th>
+              <th>学号</th>
+              <th>角色</th>
+              <th>操作</th>
             </tr>
-          ))}
-          {users.length === 0 && (
-            <tr><td colSpan={4} className="text-center text-muted">暂无用户</td></tr>
-          )}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {users.map(u => (
+              <tr key={u.id} className="align-middle text-nowrap">
+                <td>{u.name}</td>
+                <td>{u.student_id}</td>
+                <td>{u.role === 'admin' ? '管理员' : u.role === 'referee' ? '裁判' : '场地负责人'}</td>
+                <td>
+                  <button className="btn btn-outline-danger btn-sm" onClick={() => deleteUser(u.id)}>删除</button>
+                </td>
+              </tr>
+            ))}
+            {users.length === 0 && (
+              <tr><td colSpan={4} className="text-center text-muted">暂无用户</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
